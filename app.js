@@ -6,7 +6,7 @@ let defBox = document.querySelector('.def');
 let audioBox = document.querySelector('.audio');
 let loading = document.querySelector('.loading');
 
-searchBtn.addEventListener('click', function(e){
+searchBtn.addEventListener('click',async function(e){
     e.preventDefault();
    
     // clear data
@@ -25,10 +25,11 @@ searchBtn.addEventListener('click', function(e){
         return;
    }
 
-   getData(word);
+   await getData(word);
+   
 });
  async function getData(word) {
-    loading.style.display = 'none';
+    loading.style.display='unset'
     // ajax call
     const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/learners/json/${word}?key=${apiKey}`);
     const data = await response.json();
@@ -51,6 +52,12 @@ searchBtn.addEventListener('click', function(e){
             suggetion.classList.add('suggested');
             suggetion.innerText = element;
             notFound.appendChild(suggetion);
+            suggetion.style.cursor='pointer'
+            suggetion.addEventListener('click',()=>{
+                // alert(element);
+                input.value=element;
+
+            })
         })
     }
 
@@ -62,6 +69,7 @@ searchBtn.addEventListener('click', function(e){
     // sound 
     const soundName = data[0].hwi.prs[0].sound.audio
         if(soundName){
+            // console.log(soundName.charAt[0])
             renderSound(soundName);
         }
     console.log(data);
@@ -69,11 +77,13 @@ searchBtn.addEventListener('click', function(e){
 
 function renderSound(soundName){
     // https://media.merriam-webster.com/audio/prons/
-    let subfolder = soundName.charAt[0];
-    let soundSrc = `https://media.merriam-webster.com/soundc11/${subfolder}/${soundName}.wav?key=${apiKey}`;
+    let subfolder = Array.from(soundName)[0];
+    console.log(soundName)
+    let soundSrc = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subfolder}/${soundName}.mp3`;
 
     let aud = document.createElement('audio');
     aud.src = soundSrc;
     aud.controls = true;  
+    aud.type="audio/mpeg"
     audioBox.appendChild(aud);
 }
